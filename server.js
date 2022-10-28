@@ -29,32 +29,36 @@ app.get("/", (request, response) => {
 // router configuration
 app.post("/find", upload.single("userData"), async (request, response) => {
   try {
-    const { cityName, stateCode, countryCode, limit } = request.body;
+    const { address, limit } = request.body;
     const { path } = request.file;
     let lattitude = 0;
     let longitude = 0;
-    console.log(request.file);
+    const latlong = [];
+    // console.log(request.file);
 
     // convert address into lat long
     // console.log(address);
-    if (cityName != undefined && stateCode != undefined) {
+    if (address != undefined && limit != undefined) {
       const API_KEY = process.env.API_KEY;
-      if (limit) {
-        console.log("converting addresssss-----------------");
-        const URL = `http://api.openweathermap.org/geo/1.0/direct?q=${cityName},${stateCode},${countryCode}&limit=${limit}&appid=${API_KEY}`;
-        const locationData = await Axios.get(URL);
-      } else {
-        console.log("converting addresssss-----------------");
-        const URL = `http://api.openweathermap.org/geo/1.0/direct?q=${cityName},${stateCode}&appid=${API_KEY}`;
-        const locationData = await Axios.get(URL);
-        // console.log(locationData);
-        locationData.data.map((item) => {
-          lattitude = item.lat;
-          longitude = item.lon;
-          console.log(lattitude, longitude);
-        });
-      }
+      console.log("converting addresssss-----------------");
+      const URL = `https://geocoder.ls.hereapi.com/search/6.2/geocode.json?apiKey=${API_KEY}&languages=en-US&maxresults=${limit}&searchtext=${address}`;
+      const locationData = await Axios.get(URL);
+      locationData.data.Response.View[0].Result.map((item) => {
+        const locData = {
+          Latitude: 0,
+          Longitude: 0,
+        };
+        locData.Latitude = item.Location.DisplayPosition.Latitude;
+        locData.Longitude = item.Location.DisplayPosition.Longitude;
+        latlong.push(locData);
+      });
+      console.log(latlong);
     }
+    //
+    //
+    //
+    //
+
     // find address in userData
     const UserData = [];
     const Locations = [];
@@ -69,11 +73,19 @@ app.post("/find", upload.single("userData"), async (request, response) => {
         //     "------------------------------------" +
         //     item.longitudeE7
         // );
-        const lat = (item.latitudeE7 / 10000000).toFixed(7);
-        const lon = (item.longitudeE7 / 10000000).toFixed(7);
-        if (lat == lattitude && lon == longitude) {
-          Locations.push(item);
-        }
+        const lat = (item.latitudeE7 / 10000000).toFixed(2);
+        const lon = (item.longitudeE7 / 10000000).toFixed(2);
+        latlong.map((add) => {
+          // console.log("lat---", lat);
+          // console.log("lon---", lon);
+          // console.log(add.Latitude + ",,," + add.Longitude);
+          if (
+            lat == add.Latitude.toFixed(2) &&
+            lon == add.Longitude.toFixed(2)
+          ) {
+            Locations.push(item);
+          }
+        });
       });
     });
     response.status(200).json({
