@@ -5,4 +5,4 @@ COPY package*.json ./
 COPY . .
 RUN npm install --development
 RUN node server.js
-CMD [ "node", "dist/index.js" ]
+CMD [ "node", "dist/server.js" ]
