@@ -19,7 +19,7 @@ app.use(express.json());
 // configure dotEnv
 dotEnv.config({ path: "./.env" });
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5001;
 
 // simple request
 app.get("/", (request, response) => {
@@ -52,7 +52,7 @@ app.post("/find", upload.single("userData"), async (request, response) => {
         locData.Longitude = item.Location.DisplayPosition.Longitude;
         latlong.push(locData);
       });
-      console.log(latlong);
+      console.log("lattitude and longitude given by HERE API", latlong);
     }
     //
     //
@@ -61,10 +61,11 @@ app.post("/find", upload.single("userData"), async (request, response) => {
 
     // find address in userData
     const UserData = [];
-    const Locations = [];
 
     fs.readFile(path, "utf8", (err, data) => {
       if (err) throw err;
+      const Locations = [];
+      let counter = 0;
       UserData.push(JSON.parse(data));
 
       UserData[0].locations.map((item) => {
@@ -73,24 +74,35 @@ app.post("/find", upload.single("userData"), async (request, response) => {
         //     "------------------------------------" +
         //     item.longitudeE7
         // );
-        const lat = (item.latitudeE7 / 10000000).toFixed(2);
-        const lon = (item.longitudeE7 / 10000000).toFixed(2);
+        const lat = +(item.latitudeE7 / 10000000).toFixed(2);
+        const lon = +(item.longitudeE7 / 10000000).toFixed(2);
         latlong.map((add) => {
           // console.log("lat---", lat);
           // console.log("lon---", lon);
           // console.log(add.Latitude + ",,," + add.Longitude);
-          if (
-            lat == add.Latitude.toFixed(2) &&
-            lon == add.Longitude.toFixed(2)
-          ) {
+          // console.log(
+          //   "--------ADDLAT --------" +
+          //     ADDLAT +
+          //     "------Userlat-------" +
+          //     lat +
+          //     "--------Userlon------" +
+          //     lon +
+          //     "----------ADDLONG --------" +
+          //     ADDLONG
+          // );
+          const ADDLAT = +add.Latitude.toFixed(2);
+          const ADDLONG = +add.Longitude.toFixed(2);
+
+          if (lat == ADDLAT && lon == ADDLONG) {
             Locations.push(item);
+            ++counter;
           }
         });
       });
-    });
-    response.status(200).json({
-      msg: "API chal gai bhai",
-      data: Locations,
+      response.status(200).json({
+        msg: "Locations Found      " + counter + "         times",
+        data: Locations,
+      });
     });
   } catch (error) {
     console.error(error);
