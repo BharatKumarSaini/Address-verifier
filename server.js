@@ -18,7 +18,7 @@ app.use(express.json());
 // configure dotEnv
 dotEnv.config({ path: "./.env" });
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 7780;
 
 // simple request
 app.get("/", (request, response) => {

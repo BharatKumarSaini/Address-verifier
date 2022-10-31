@@ -1,0 +1,8 @@
+version: '3'
+services:
+  backend:
+    container_name: Address-Verifier
+    build: .
+    ports:
+      - 7780:7780
+    restart: always
