@@ -1,0 +1,106 @@
+openapi: 3.0.3
+info:
+  title: Address Verification 1.0
+  description: |-
+    This is a post API that takes User location data and a place to find in that data with Limit
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: bharatk.saini@thewitslab.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+servers:
+  - url: http://localhost:5001/find
+tags:
+  - name: address verification
+    description: a simple post api
+    
+paths:
+  /find:
+    post:
+      tags:
+        - address
+      summary: find the address
+      description: upload the location data with location to find
+      requestBody:
+        description: Upload the userdata that is Record.JSON file with the location you want to find and the no of limit 
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Request'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'          
+        '400':
+          description: Invalid data supplied
+        '404':
+          description: location not found
+        '405':
+          description: Validation exception
+      security:
+        - address_auth:
+            - write:pets
+            - read:pets
+
+components:
+  schemas:
+    Address:
+      type: string
+    UserData:
+      type: array
+      items: 
+        type: object
+    limit:
+      type: number
+    msg: 
+      type: string
+    data:
+      type: array
+      items:
+        type: object
+    Request:
+      type: object
+      properties:
+        Address:
+          schema:
+            $ref: '#/components/schemas/Address'
+          example: '437 Lytton Palo Alto 94301'
+        limit:
+          example: 10
+          schema:
+            $ref: '#/components/schemas/limit'
+        UserData:
+          example: [{},{},{},{}]
+          schema:
+            $ref: '#/components/schemas/UserData'
+    Response:
+      type: object
+      properties:
+        msg: 
+          example: "Location found 200 times"
+          schema:
+            $ref: '#/components/schemas/msg'
+        data:
+          example: [{},{},{}]
+          schema:
+            $ref: '#/components/schemas/data'
+
+  securitySchemes:
+    address_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://address.swagger.io/oauth/authorize
+          scopes:
+            write:pets: upload user location data
+            read:pets: read the location times it appread
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
