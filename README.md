@@ -15,7 +15,7 @@ echo API_KEY='your api key' > .env
 # run server.js with node
 node server.js
 
-# hit the endpoint :- http://localhost:5001/find 
+# hit the endpoint of POST API :- http://localhost:5001/find 
 # send the following data :-
 # userData : Records.json file
 # address : the location you want to search
