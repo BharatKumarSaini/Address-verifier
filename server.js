@@ -23,7 +23,7 @@ const port = process.env.PORT || 5001;
 
 // simple request
 app.get("/", (request, response) => {
-  response.send(`<h2>aur bhai kya haal h ???</h2>`);
+  response.send(`<h2>/find for the post api to search address</h2>`);
 });
 
 // router configuration
