@@ -2,7 +2,6 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const dotEnv = require("dotenv");
-const { body, validationResult, file } = require("express-validator");
 const multer = require("multer");
 const upload = multer({
   dest: "data",
@@ -31,13 +30,7 @@ app.post("/find", upload.single("userData"), async (request, response) => {
   try {
     const { address, limit } = request.body;
     const { path } = request.file;
-    let lattitude = 0;
-    let longitude = 0;
     const latlong = [];
-    // console.log(request.file);
-
-    // convert address into lat long
-    // console.log(address);
     if (address != undefined && limit != undefined) {
       const API_KEY = process.env.API_KEY;
       console.log("converting addresssss-----------------");
@@ -52,7 +45,6 @@ app.post("/find", upload.single("userData"), async (request, response) => {
         locData.Longitude = item.Location.DisplayPosition.Longitude;
         latlong.push(locData);
       });
-      console.log("lattitude and longitude given by HERE API", latlong);
     }
     //
     //
@@ -69,27 +61,9 @@ app.post("/find", upload.single("userData"), async (request, response) => {
       UserData.push(JSON.parse(data));
 
       UserData[0].locations.map((item) => {
-        // console.log(
-        //   item.latitudeE7 +
-        //     "------------------------------------" +
-        //     item.longitudeE7
-        // );
         const lat = +(item.latitudeE7 / 10000000).toFixed(2);
         const lon = +(item.longitudeE7 / 10000000).toFixed(2);
         latlong.map((add) => {
-          // console.log("lat---", lat);
-          // console.log("lon---", lon);
-          // console.log(add.Latitude + ",,," + add.Longitude);
-          // console.log(
-          //   "--------ADDLAT --------" +
-          //     ADDLAT +
-          //     "------Userlat-------" +
-          //     lat +
-          //     "--------Userlon------" +
-          //     lon +
-          //     "----------ADDLONG --------" +
-          //     ADDLONG
-          // );
           const ADDLAT = +add.Latitude.toFixed(2);
           const ADDLONG = +add.Longitude.toFixed(2);
 
